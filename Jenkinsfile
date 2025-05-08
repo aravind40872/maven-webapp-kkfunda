@@ -31,39 +31,74 @@ pipeline {
 
     stage('COMPILE') {
       steps {
-        sh "mvn clean compile"
+        script {
+          try {
+            sh "mvn clean compile"
+          } catch (err) {
+            slackSend(channel: '#all-devops', color: 'danger', message: "🧹 *Compile stage failed!* Clean code ra babu! 👨‍💻\n${env.BUILD_URL}")
+            error("Compile stage failed")
+          }
+        }
       }
     }
 
     stage('BUILD') {
       steps {
-        sh "mvn clean package"
+        script {
+          try {
+            sh "mvn clean package"
+          } catch (err) {
+            slackSend(channel: '#all-devops', color: 'danger', message: "📦 *Build stage failed!* Package chakkaga levu ra bro. 🤷‍♂️\n${env.BUILD_URL}")
+            error("Build stage failed")
+          }
+        }
       }
     }
 
     stage('SQ REPORT') {
       steps {
-        sh "mvn clean sonar:sonar"
+        script {
+          try {
+            sh "mvn clean sonar:sonar"
+          } catch (err) {
+            slackSend(channel: '#all-devops', color: 'danger', message: "🔍 *SonarQube stage failed!* Bugs buggerlu chusi fix chey ra! 🐞\n${env.BUILD_URL}")
+            error("SonarQube stage failed")
+          }
+        }
       }
     }
 
     stage('Deploy to Nexus') {
       steps {
-        sh "mvn clean deploy"
+        script {
+          try {
+            sh "mvn clean deploy"
+          } catch (err) {
+            slackSend(channel: '#all-devops', color: 'danger', message: "🚀 *Nexus Deploy failed!* Repo ki reach avvaledu ra! 📦\n${env.BUILD_URL}")
+            error("Nexus deploy failed")
+          }
+        }
       }
     }
 
     stage('Deploy App') {
       steps {
-        deploy adapters: [
-          tomcat9(
-            credentialsId: '3706ed76-0da5-431d-b454-786b6873bd92',
-            path: '',
-            url: 'http://3.229.139.27:8080/'
-          )
-        ],
-        contextPath: null,
-        war: '**/maven-web-application.war'
+        script {
+          try {
+            deploy adapters: [
+              tomcat9(
+                credentialsId: '3706ed76-0da5-431d-b454-786b6873bd92',
+                path: '',
+                url: 'http://3.229.139.27:8080/'
+              )
+            ],
+            contextPath: null,
+            war: '**/maven-web-application.war'
+          } catch (err) {
+            slackSend(channel: '#all-devops', color: 'danger', message: "🌐 *Tomcat Deploy failed!* Server daggara bottu padindi! 🔥\n${env.BUILD_URL}")
+            error("Tomcat deploy failed")
+          }
+        }
       }
     }
 
@@ -84,7 +119,7 @@ pipeline {
       slackSend(
         channel: '#all-devops',
         color: 'danger',
-        message: "❌ FAILURE: Pipeline '${env.JOB_NAME} #${env.BUILD_NUMBER}' failed.\nDetails: ${env.BUILD_URL}"
+        message: "❌ Pipeline '${env.JOB_NAME} #${env.BUILD_NUMBER}' failed somewhere. Go check and fix it, Captain! 👨‍🔧\n${env.BUILD_URL}"
       )
     }
   }
