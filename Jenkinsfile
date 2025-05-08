@@ -23,7 +23,7 @@ pipeline {
 
     stage('checkout') {
       steps {
-        git branch: 'dev',
+        git branch: 'master',
             credentialsId: '886f47e6-7978-490e-aeee-3b4bab000dea',
             url: 'https://github.com/aravind40872/maven-webapp-kkfunda.git'
       }
