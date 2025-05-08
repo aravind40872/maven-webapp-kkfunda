@@ -25,7 +25,7 @@ stage('checkout') {
   steps {
     git branch: 'master',
         credentialsId: '886f47e6-7978-490e-aeee-3b4bab000dea',
-        url: '<https://github.com/aravind40872/maven-webapp-kkfunda.git>'
+        url: 'https://github.com/aravind40872/maven-webapp-kkfunda.git'
   }
 }
 
@@ -59,7 +59,7 @@ stage('Deploy App') {
       tomcat9(
         credentialsId: '3706ed76-0da5-431d-b454-786b6873bd92',
         path: '',
-        url: '<http://3.229.139.27:8080/>'
+        url: 'http://3.229.139.27:8080/'
       )
     ],
     contextPath: null,
